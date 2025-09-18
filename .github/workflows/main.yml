@@ -14,7 +14,6 @@ on:
 
 env:
   JIRA_URL: "https://marketingpachas.atlassian.net"
-  JIRA_PROJECT: "KAN"
   JIRA_AUTH: "${{ secrets.PAT_TOKEN }}"
 
 jobs:

@@ -14,7 +14,7 @@ on:
 
 jobs:
   jira-transition-job:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: write   # necesario para checkout
 
@@ -34,42 +34,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.vars.outputs.branch }}
-
-      - name: Login en Vault
-        shell: bash
-        env:
-          VAULT_ADDR: http://127.0.0.1:8200
-          VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
-          VAULT_SKIP_VERIFY: "true"
-          PATH: ${{ env.PATH }}:/home/gha-runner/vault
-        run: |
-          set -Eeuo pipefail
-          vault --version
-          vault login "$VAULT_TOKEN" >/dev/null
-          vault token lookup
-
-      - name: Obtener token de GitHub desde Vault (solo bash)
-        id: get-creds
-        shell: bash
-        env:
-          VAULT_ADDR: http://127.0.0.1:8200
-          VAULT_SKIP_VERIFY: "true"
-          PATH: ${{ env.PATH }}:/home/gha-runner/vault
-        run: |
-          set -Eeuo pipefail
-      
-          # Leer token desde Vault y limpiar saltos de línea / retornos de carro
-          GH_TOKEN=$(vault kv get -field=GH_TOKEN secret/github)
-          GH_TOKEN="${GH_TOKEN//$'\n'/}"   # eliminar saltos de línea
-          GH_TOKEN="${GH_TOKEN//$'\r'/}"   # eliminar retornos de carro
-      
-          # Guardar en entorno de GitHub Actions
-          echo "GH_TOKEN=$GH_TOKEN" >> "$GITHUB_ENV"
-      
-          # Mostrar token visible en logs
-          echo "🔑 Token GitHub obtenido: $GH_TOKEN"
-      
-
+    
 
       - name: Mostrar payload recibido
         run: |
@@ -79,7 +44,7 @@ jobs:
       - name: Lanzar workflow main.yml con cURL
         shell: bash
         env:
-          GH_TOKEN: ${{ env.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
           ISSUE_KEY: ${{ steps.vars.outputs.issue }}
           BRANCH_NAME: ${{ steps.vars.outputs.branch }}
         run: |

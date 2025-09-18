@@ -14,7 +14,7 @@ on:
 
 env:
   JIRA_URL: "https://marketingpachas.atlassian.net"
-  JIRA_AUTH: "${{ secrets.PAT_TOKEN }}"
+  JIRA_AUTH: "${{ secrets.JIRA_TOKEN }}"
 
 jobs:
   jira-itsm-workflow:

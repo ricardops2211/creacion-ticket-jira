@@ -15,6 +15,7 @@ on:
 env:
   JIRA_URL: "https://marketingpachas.atlassian.net"
   JIRA_PROJECT: "KAN"
+  JIRA_AUTH: "${{ secrets.PAT_TOKEN }}"
 
 jobs:
   jira-itsm-workflow:
@@ -37,29 +38,6 @@ jobs:
         with:
           ref: ${{ steps.vars.outputs.branch }}
 
-      - name: Login en Vault
-        shell: bash
-        env:
-          VAULT_ADDR: http://127.0.0.1:8200
-          VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
-          VAULT_SKIP_VERIFY: "true"
-          PATH: ${{ env.PATH }}:/home/gha-runner/vault
-        run: |
-          set -Eeuo pipefail
-          vault login "$VAULT_TOKEN" >/dev/null
-
-      - name: Obtener credenciales Jira
-        id: get-jira
-        shell: bash
-        env:
-          VAULT_ADDR: http://127.0.0.1:8200
-          VAULT_SKIP_VERIFY: "true"
-          PATH: ${{ env.PATH }}:/home/gha-runner/vault
-        run: |
-          jiraAuth=$(vault kv get -field=JIRA_AUTH secret/jira)
-          echo "::add-mask::$jiraAuth"
-          echo "JIRA_AUTH=$jiraAuth" >> "$GITHUB_ENV"
-
       - name: Procesar JSON de ticket con Python
         shell: bash
         env:
@@ -70,8 +48,6 @@ jobs:
           TICKET_FILE="tickets/story_001_processed.json"
           echo "📂 Usando archivo procesado: $TICKET_FILE"
           echo "TICKET_FILE=$TICKET_FILE" >> "$GITHUB_ENV"
-
-
 
 
       - name: Crear historia en Jira y agregar comentario

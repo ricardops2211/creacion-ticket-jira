@@ -30,16 +30,17 @@ jobs:
             echo "issue=${{ github.event.inputs.issue_key }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Checkout código en la rama del ticket
+      - name: Checkout código en main con prefijo de branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ steps.vars.outputs.branch }}
-    
+          ref: main
+          path: ${{ steps.vars.outputs.branch }}
 
       - name: Mostrar payload recibido
         run: |
           echo "🔑 Issue Key: ${{ steps.vars.outputs.issue }}"
           echo "🌿 Branch:   ${{ steps.vars.outputs.branch }}"
+          echo "📂 Código disponible en: ${{ steps.vars.outputs.branch }}/"
 
       - name: Lanzar workflow main.yml con cURL
         shell: bash
